@@ -1,0 +1,15 @@
+﻿1. 
+A lerp (aka. linear interpolation) is always the of the form
+blendedValue=(1−t)⋅startValue+t⋅endValue
+
+2.
+Formula of a sphere in vector form:
+(p−c)⋅(p−c)=R^2   where c is the center, P is a point
+Therefore, to validate if a ray hits a sphere, use
+t^2b⋅b +2tb⋅(a−c)+(a−c)⋅(a−c)−R^2=0
+
+However, there are issues. Solutions should be >0, i.e. you can only see things in front of you.
+
+3. 
+Surface-normal 法向量
+For a sphere, the outward normal is in the direction of the hit point minus the center.
