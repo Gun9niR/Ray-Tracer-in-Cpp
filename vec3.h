@@ -135,3 +135,10 @@ vec3 random_in_hemisphere(const vec3& normal)
 		return in_unit_sphere;
 	else return -in_unit_sphere;
 }
+
+vec3 reflect(const vec3& v, const vec3& n) 
+{
+	//v is the in ray, n is the normal of the hit point
+	//it returns the direction of the reflected ray, rather than the ray itself
+	return v - 2 * dot(v, n) * n;// n account for direction, dot account for the size, the minus is due to v¡¤b<0
+}

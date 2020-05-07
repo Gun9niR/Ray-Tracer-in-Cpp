@@ -1,5 +1,6 @@
 ﻿#include "rtweekend.h" //include utility functions and basic data types
 
+#include "material.h"
 #include "hittable_list.h" //include the tool to store all the objects to be hitted
 #include "sphere.h" //a kind of hittable object
 #include "camera.h"
@@ -14,8 +15,11 @@ vec3 ray_color(const ray& r,const hittable& world, int depth) {
 		return vec3(0, 0, 0);
 
 	if (world.hit(r, 0.001, infinity, rec)) {
-		vec3 target = rec.p + random_in_hemisphere(rec.normal);
-		return 0.5 * ray_color(ray(rec.p, target - rec.p), world,depth-1);  //反射次数越多就越暗
+		ray scattered;
+		vec3 attenuation;
+		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+			return attenuation * ray_color(scattered, world, depth - 1);
+		return vec3(0, 0, 0);
 	}
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.y() + 1);
@@ -24,17 +28,18 @@ vec3 ray_color(const ray& r,const hittable& world, int depth) {
 
 int main()
 {
-	const int image_width = 200;
-	const int image_height = 100;
+	const int image_width = 2000;
+	const int image_height = 1000;
 	const int samples_per_pixel = 100;
 	const int max_depth = 50;
 
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	hittable_list world;
-	world.add(make_shared<sphere>(vec3(0, 0, -1), 0.5));
-	world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100));
-
+	world.add(make_shared<sphere>(vec3(0, 0, -1), 0.5, make_shared<lambertian>(vec3(0.7,0.3,0.3))));
+	world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100 ,make_shared<lambertian>(vec3(0.8,0.8,0))));
+	world.add(make_shared<sphere>(vec3(1, 0, -1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2)))); 
+	world.add(make_shared<sphere>(vec3(-1, 0, -1), 0.5, make_shared<metal>(vec3(0.8, 0.8, 0.8))));
 	camera cam;
 
 	for (int j = image_height - 1; j >= 0; j--) {
