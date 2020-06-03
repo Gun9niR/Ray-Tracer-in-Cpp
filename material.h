@@ -14,7 +14,7 @@ public:
 	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const {
 		//compute the reflecting ray.
 		vec3 scatter_direction = rec.normal + random_unit_vector();
-		scattered = ray(rec.p, scatter_direction);
+		scattered = ray(rec.p, scatter_direction, r_in.time());
 		attenuation = albedo;
 		return true;
 	}
@@ -60,7 +60,7 @@ public:
 		}
 
 		vec3 unit_direction = unit_vector(r_in.direction());
-		double cos_theta = ffmin(dot(-unit_direction, rec.normal), 1.0);
+		double cos_theta = fmin(dot(-unit_direction, rec.normal), 1.0);
 		double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 		if (etai_over_etat * sin_theta > 1) {
 			//there's no solution for the theta prime, meaning reflection

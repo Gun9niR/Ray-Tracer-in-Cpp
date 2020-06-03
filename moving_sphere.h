@@ -1,25 +1,31 @@
 #pragma once
-
-#include "hittable.h"
-#include "vec3.h"
-class sphere : public hittable
+#include"hittable.h"
+#include"vec3.h"
+class moving_sphere : public hittable 
 {
 public:
-	sphere() {}
-	sphere(vec3 cen, double r, shared_ptr<material> m) :center(cen), radius(r) , mat_ptr(m) {};
-	
+	moving_sphere() {}
+	moving_sphere(
+		point3 cen0, point3 cen1, double t0, double t1, double r,
+		shared_ptr<material> m) :center0(cen0), center1(cen1), time0(t0), time1(t1), radius(r), mat_ptr(m) {};
+
+	point3 center(double time) const;
 	virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const;
 	virtual bool bounding_box(double t0, double t1, aabb& output_box) const;
-
+	
 public:
-	vec3 center;
+	point3 center0, center1;
+	double time0, time1;
 	double radius;
 	shared_ptr<material> mat_ptr;
 };
 
-bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const
-{
-	vec3 oc = r.origin() - center;
+point3 moving_sphere::center(double time) const {
+	return center0 + ((time - time0) / (time1 - time0)) * (center1 - center0);
+}
+
+bool moving_sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
+	vec3 oc = r.origin() - center(r.time());
 	auto a = dot(r.direction(), r.direction());
 	auto half_b = dot(oc, r.direction());
 	auto c = dot(oc, oc) - radius * radius;
@@ -31,7 +37,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 		if (temp<t_max && temp>t_min) {  //t_min makes sure you don't see things behind you
 			rec.t = temp;
 			rec.p = r.at(rec.t);
-			vec3 outward_normal = (rec.p - center) / radius;
+			vec3 outward_normal = (rec.p - center(r.time())) / radius;
 			rec.set_face_normal(r, outward_normal);  //this makes sure normal points against the ray hitting the surface
 			rec.mat_ptr = mat_ptr;
 			return true;
@@ -40,7 +46,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 		if (temp<t_max && temp>t_min) {
 			rec.t = temp;
 			rec.p = r.at(rec.t);
-			vec3 outward_normal = (rec.p - center) / radius;
+			vec3 outward_normal = (rec.p - center(r.time())) / radius;
 			rec.set_face_normal(r, outward_normal);  //this makes sure normal points against the ray hitting the surface
 			rec.mat_ptr = mat_ptr;
 			return true;
@@ -49,7 +55,9 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 	return false;
 }
 
-bool sphere::bounding_box(double t0, double t1, aabb& output_box) const {
-	output_box = aabb(center - vec3(radius, radius, radius), center + vec3(radius, radius, radius));
+bool moving_sphere::bounding_box(double t0, double t1, aabb& output_box) const {
+	aabb box0(center(t0) - vec3(radius, radius, radius), center(t0) + vec3(radius, radius, radius));
+	aabb box1(center(t1) - vec3(radius, radius, radius), center(t1) + vec3(radius, radius, radius));
+	output_box = surrounding_box(box0, box1);
 	return true;
 }

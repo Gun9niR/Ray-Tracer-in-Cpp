@@ -151,10 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RayTracer.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aabb.h" />
+    <ClInclude Include="bvh.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="hittable.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="ray.h" />
@@ -162,9 +165,7 @@
     <ClInclude Include="vec3.h" />
     <ClInclude Include="hittable_list.h" />
     <ClInclude Include="rtweekend.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Text.txt" />
+    <ClInclude Include="moving_sphere.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

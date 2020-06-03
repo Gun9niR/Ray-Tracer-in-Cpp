@@ -45,20 +45,6 @@ public:
 		return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
 	}
 
-	void write_color(std::ostream& out,int samples_per_pixel) {
-		//Divide the color total by the number of samples. Now the color values before tansaltion are no longer among [0,1]
-		//for a gamma value of 2.0
-		auto scale = 1.0 / samples_per_pixel;
-		auto r = sqrt(scale * e[0]);
-		auto g = sqrt(scale * e[1]);
-		auto b = sqrt(scale * e[2]);
-
-		// Write the translated [0,255] value of each color component.
-		out << static_cast<int>(256 * clamp(r,0.0,0.999)) << ' '
-			<< static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
-			<< static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
-	}
-
 	inline static vec3 random() {
 		return vec3(random_double(), random_double(), random_double());
 	}
@@ -67,6 +53,9 @@ public:
 		return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
 	}
 };
+
+using point3=vec3;
+using color=vec3;
 
 inline std::ostream& operator<<(std::ostream& out, const vec3& v) {
 	return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
