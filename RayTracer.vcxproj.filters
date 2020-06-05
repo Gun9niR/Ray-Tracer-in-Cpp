@@ -39,9 +39,6 @@
     <ClInclude Include="rtweekend.h">
       <Filter>头文件\InOneWeekend</Filter>
     </ClInclude>
-    <ClInclude Include="material.h">
-      <Filter>头文件\InOneWeekend</Filter>
-    </ClInclude>
     <ClInclude Include="hittable_list.h">
       <Filter>头文件\InOneWeekend</Filter>
     </ClInclude>
@@ -58,6 +55,15 @@
       <Filter>头文件\TheNextWeek</Filter>
     </ClInclude>
     <ClInclude Include="bvh.h">
+      <Filter>头文件\TheNextWeek</Filter>
+    </ClInclude>
+    <ClInclude Include="material.h">
+      <Filter>头文件\InOneWeekend</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>头文件\TheNextWeek</Filter>
+    </ClInclude>
+    <ClInclude Include="perlin.h">
       <Filter>头文件\TheNextWeek</Filter>
     </ClInclude>
   </ItemGroup>

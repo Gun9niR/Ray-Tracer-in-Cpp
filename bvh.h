@@ -20,11 +20,13 @@ public:
 	aabb box;
 };
 
+//the box is already constructed in the constructor
 bool bvh_node::bounding_box(double t0, double t1, aabb& output_box) const {
 	output_box = box;
 	return true;
 }
 
+//check if hit an object. just hitting the aabb won't count
 bool bvh_node::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
 	if (!box.hit(r, t_min, t_max)) return false;
 
@@ -33,8 +35,6 @@ bool bvh_node::hit(const ray& r, double t_min, double t_max, hit_record& rec) co
 
 	return hit_left || hit_right;
 }
-
-
 
 bool box_x_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b)
 {
