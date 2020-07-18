@@ -17,6 +17,16 @@ public:
 	shared_ptr<material> mat_ptr;
 };
 
+void get_sphere_uv(const vec3& p, double& u, double& v)
+{
+	//view note to see the geometric meaning of phi and theta
+	auto phi = atan2(p.z(), p.x());
+	auto theta = asin(p.y());
+	//map phi and theta to u, v, ranging from 0 to 1
+	u = 1 - (phi + pi) / (2 * pi);
+	v = (theta + pi / 2) / pi;
+}
+
 bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const
 {
 	vec3 oc = r.origin() - center;
@@ -34,6 +44,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 			vec3 outward_normal = (rec.p - center) / radius;
 			rec.set_face_normal(r, outward_normal);  //this makes sure normal points against the ray hitting the surface
 			rec.mat_ptr = mat_ptr;
+			get_sphere_uv((rec.p - center) / radius, rec.u, rec.v);
 			return true;
 		}
 		temp = (-half_b + root) / a;
@@ -43,6 +54,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 			vec3 outward_normal = (rec.p - center) / radius;
 			rec.set_face_normal(r, outward_normal);  //this makes sure normal points against the ray hitting the surface
 			rec.mat_ptr = mat_ptr;
+			get_sphere_uv((rec.p - center) / radius, rec.u, rec.v);
 			return true;
 		}
 	}

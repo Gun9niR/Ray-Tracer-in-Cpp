@@ -8,6 +8,7 @@ void write_color(std::ostream& out, color pixel_color,int samples_per_pixel) {
 	//Divide the color total by the number of samples. Now the color values before tansaltion are no longer among [0,1]
 	//for a gamma value of 2.0
 	auto scale = 1.0 / samples_per_pixel;
+	//r,g,b < 1
 	r = sqrt(scale * r);
 	g = sqrt(scale * g);
 	b = sqrt(scale * b);

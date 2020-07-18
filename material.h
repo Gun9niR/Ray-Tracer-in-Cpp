@@ -5,10 +5,15 @@
 class material
 {
 public:
+	virtual color emitted(double u, double v, const point3& p) const {
+		return color(0, 0, 0);
+	}
+public:
 	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const = 0;
 };
 
-class lambertian :public material {
+class lambertian :public material 
+{
 public:
 	lambertian(shared_ptr<texture> a) :albedo(a) {}
 
@@ -23,7 +28,8 @@ public:
 	shared_ptr<texture> albedo; //Âþ·´ÉäÏµÊý
 };
 
-class metal : public material {
+class metal : public material 
+{
 public:
 	metal(const vec3& a,double f) :albedo(a),fuzz(f<1?f:1) {}
 
@@ -46,7 +52,8 @@ double schlick(double cosine, double ref_idx)
 	return r0 + (1 - r0) * pow((1 - cosine), 5); 
 }
 
-class dielectric :public material {
+class dielectric :public material 
+{
 public:
 	dielectric(double ri) :ref_idx(ri) {}  //etha
 
@@ -83,4 +90,19 @@ public:
 
 public:
 	double ref_idx;
+};
+
+class diffuse_light:public material 
+{
+public:
+	diffuse_light(shared_ptr<texture> a) :emit(a) {}
+
+	virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const { return false; }
+
+	virtual color emitted(double u, double v, const point3& p) const {
+		return emit->value(u, v, p);
+	}
+
+public:
+	shared_ptr<texture> emit;
 };

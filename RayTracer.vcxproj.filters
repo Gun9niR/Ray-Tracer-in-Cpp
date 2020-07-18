@@ -13,14 +13,17 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\InOneWeekend">
-      <UniqueIdentifier>{aa5a2279-3c54-4221-b7e5-e4c7fb86cc67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Common">
       <UniqueIdentifier>{70e95664-8b33-4deb-98c6-73db1b310b8c}</UniqueIdentifier>
     </Filter>
     <Filter Include="头文件\TheNextWeek">
       <UniqueIdentifier>{2220eb80-fbc4-40be-b329-54cc8bbf4358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\InOneWeekend">
+      <UniqueIdentifier>{aa5a2279-3c54-4221-b7e5-e4c7fb86cc67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Common\External">
+      <UniqueIdentifier>{1c0600ec-9c48-4033-9506-d34b6ea9976b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +67,18 @@
       <Filter>头文件\TheNextWeek</Filter>
     </ClInclude>
     <ClInclude Include="perlin.h">
+      <Filter>头文件\TheNextWeek</Filter>
+    </ClInclude>
+    <ClInclude Include="rtw_stb_image.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image_write.h">
+      <Filter>头文件\Common\External</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>头文件\Common\External</Filter>
+    </ClInclude>
+    <ClInclude Include="aarect.h">
       <Filter>头文件\TheNextWeek</Filter>
     </ClInclude>
   </ItemGroup>
