@@ -81,6 +81,12 @@
     <ClInclude Include="aarect.h">
       <Filter>头文件\TheNextWeek</Filter>
     </ClInclude>
+    <ClInclude Include="box.h">
+      <Filter>头文件\TheNextWeek</Filter>
+    </ClInclude>
+    <ClInclude Include="constant_medium.h">
+      <Filter>头文件\TheNextWeek</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

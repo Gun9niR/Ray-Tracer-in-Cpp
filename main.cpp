@@ -8,6 +8,9 @@
 #include "moving_sphere.h"
 #include "rtw_stb_image.h"
 #include "aarect.h"
+#include "box.h"
+#include "constant_medium.h"
+#include "bvh.h"
 #include <iostream>
 
 vec3 ray_color(const ray& r, const color& background, const hittable& world, int depth) 
@@ -92,9 +95,9 @@ hittable_list random()
 
 void random_scene()
 {
-	const int image_width = 1920;
-	const int image_height = 1080;
-	const int samples_per_pixel = 100;
+	const int image_width = 400;
+	const int image_height = 225;
+	const int samples_per_pixel = 50;
 	const int max_depth = 50;
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
@@ -166,8 +169,8 @@ hittable_list random_checker()
 
 void random_checker_scene()
 {
-	const int image_width = 1920;
-	const int image_height = 1080;
+	const int image_width = 400;
+	const int image_height = 225;
 	const int samples_per_pixel = 100;
 	const int max_depth = 50;
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -181,7 +184,7 @@ void random_checker_scene()
 	vec3 vup(0, 1, 0);  	//vup决定了视角在camera平面上旋转多少度，0，1，0就是人直立，1，0，0就是往右歪头
 	auto dist_to_focus = 10;
 	auto aperture = 0.0;
-	camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0, 1);
+	camera cam(lookfrom, lookat, vup, 40, aspect_ratio, aperture, dist_to_focus, 0, 1);
 
 	for (int j = image_height - 1; j >= 0; j--) {
 		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -342,8 +345,239 @@ void simple_light_scene()
 	std::cerr << "\nDone.\n";
 }
 
+hittable_list cornell_box()
+{
+	hittable_list objects;
+
+	auto red = make_shared<lambertian>(make_shared<solid_color>(.65, .05, .05));
+	auto white = make_shared<lambertian>(make_shared<solid_color>(.73, .73, .73));
+	auto green = make_shared<lambertian>(make_shared<solid_color>(.12, .45, .15));
+	auto light = make_shared<diffuse_light>(make_shared<solid_color>(15, 15, 15));
+
+	objects.add(make_shared<flip_face>(make_shared<yz_rect>(0, 555, 0, 555, 555, green)));
+	objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+	objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+	objects.add(make_shared<flip_face>(make_shared<xz_rect>(0, 555, 0, 555, 0, white)));
+	objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+	objects.add(make_shared<flip_face>(make_shared<xy_rect>(0, 555, 0, 555, 555, white)));
+
+	shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white); 
+	box1 = make_shared<rotate_y>(box1, 15); 
+	box1 = make_shared<translate>(box1, vec3(265, 0, 295)); 
+	objects.add(box1);
+
+	shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white); 
+	box2 = make_shared<rotate_y>(box2, -18); 
+	box2 = make_shared<translate>(box2, vec3(130, 0, 65)); 
+	objects.add(box2);
+
+	return objects;
+}
+
+void cornell_box_scene()
+{
+	const int image_width = 600;
+	const int image_height = 600;
+	const int samples_per_pixel = 100;
+	const int max_depth = 50;
+	const color background(0, 0, 0);
+	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+
+	auto world = cornell_box();
+
+	const auto aspect_ratio = double(image_width) / image_height;
+	point3 lookfrom(278, 278, -800);
+	point3 lookat(278, 278, 0);
+	vec3 vup(0, 1, 0);  	//vup决	定了视角在camera平面上旋转多少度，0，1，0就是人直立，1，0，0就是往右歪头
+	auto dist_to_focus = 10.0;
+	auto aperture = 0.0;
+	auto vfov = 40.0;
+	camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+
+	for (int j = image_height - 1; j >= 0; j--) {
+		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+		for (int i = 0; i < image_width; i++) {
+			color color(0, 0, 0);
+			for (int s = 0; s < samples_per_pixel; s++) {
+				auto u = (i + random_double()) / image_width;    //random_double() is for anti-alias
+				auto v = (j + random_double()) / image_height;
+				ray r = cam.get_ray(u, v);                       //在get_ray中调整发出点，时间在[time0, time1]之间随机选择
+				color += ray_color(r, background, world, max_depth);
+			}
+			write_color(std::cout, color, samples_per_pixel);
+		}
+	}
+
+	std::cerr << "\nDone.\n";
+}
+
+hittable_list cornell_smoke() {
+	hittable_list objects;
+
+	auto red = make_shared<lambertian>(make_shared<solid_color>(.65, .05, .05));
+	auto white = make_shared<lambertian>(make_shared<solid_color>(.73, .73, .73));
+	auto green = make_shared<lambertian>(make_shared<solid_color>(.12, .45, .15));
+	auto light = make_shared<diffuse_light>(make_shared<solid_color>(7, 7, 7));
+
+	objects.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));
+	objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+	objects.add(make_shared<xz_rect>(113, 443, 127, 432, 554, light));
+	objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+	objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
+	objects.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));
+
+	shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white);
+	box1 = make_shared<rotate_y>(box1, 15);
+	box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+
+	shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white);
+	box2 = make_shared<rotate_y>(box2, -18);
+	box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+
+	objects.add(make_shared<constant_medium>(box1, 0.01, make_shared<solid_color>(0, 0, 0)));
+	objects.add(make_shared<constant_medium>(box2, 0.01, make_shared<solid_color>(1, 1, 1)));
+
+	return objects;
+}
+
+void cornell_smoke_scene()
+{
+	const int image_width = 600;
+	const int image_height = 600;
+	const int samples_per_pixel = 100;
+	const int max_depth = 50;
+	const color background(0, 0, 0);
+	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+	auto world = cornell_smoke();
+
+	const auto aspect_ratio = double(image_width) / image_height;
+	point3 lookfrom(278, 278, -800);
+	point3 lookat(278, 278, 0);
+	vec3 vup(0, 1, 0);  	//vup决	定了视角在camera平面上旋转多少度，0，1，0就是人直立，1，0，0就是往右歪头
+	auto dist_to_focus = 10.0;
+	auto aperture = 0.0;
+	auto vfov = 40.0;
+	camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+
+	for (int j = image_height - 1; j >= 0; j--) {
+		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+		for (int i = 0; i < image_width; i++) {
+			color color(0, 0, 0);
+			for (int s = 0; s < samples_per_pixel; s++) {
+				auto u = (i + random_double()) / image_width;    //random_double() is for anti-alias
+				auto v = (j + random_double()) / image_height;
+				ray r = cam.get_ray(u, v);                       //在get_ray中调整发出点，时间在[time0, time1]之间随机选择
+				color += ray_color(r, background, world, max_depth);
+			}
+			write_color(std::cout, color, samples_per_pixel);
+		}
+	}
+
+	std::cerr << "\nDone.\n";
+}
+
+hittable_list final()
+{
+	hittable_list boxes1;
+	//material for the ground
+	auto ground = make_shared<lambertian>(make_shared <solid_color>(0.48, 0.83, 0.53));
+
+	const int boxes_per_side = 20;
+	for (int i = 0; i < boxes_per_side; i++) {
+		for (int j = 0; j < boxes_per_side; j++) {
+			auto w = 100;
+			auto x0 = -1000 + i * w;
+			auto z0 = -1000 + j * w;
+			auto y0 = 0;
+			auto x1 = x0 + w;
+			auto y1 = random_double(1, 101);
+			auto z1 = z0 + w;
+
+			boxes1.add(make_shared<box>(point3(x0, y0, z0), point3(x1, y1, z1), ground));
+		}
+	}
+
+	hittable_list objects;
+
+	objects.add(make_shared<bvh_node>(boxes1, 0, 1));
+
+	//light material
+	auto light = make_shared<diffuse_light>(make_shared<solid_color>(7, 7, 7));
+	objects.add(make_shared<xz_rect>(123, 423, 147, 412, 554, light));
+
+	auto center1 = point3(400, 400, 200);
+	auto center2 = center1 + vec3(30, 0, 0);
+	auto moving_sphere_material = make_shared<lambertian>(make_shared<solid_color>(0.7, 0.3, 0.1));
+	objects.add(make_shared<moving_sphere>(center1, center2, 0, 1, 50, moving_sphere_material));
+
+	objects.add(make_shared<sphere>(point3(260, 150, 45), 50, make_shared<dielectric>(1.5)));
+	objects.add(make_shared<sphere>(point3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 10)));
+
+	auto boundary = make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5));
+	objects.add(boundary);
+	//if refract, the ray enters the const medium, which forms a blue glass ball
+	objects.add(make_shared<constant_medium>(boundary, 0.2, make_shared<solid_color>(0.2, 0.4, 0.9)));
+	
+	boundary = make_shared<sphere>(point3(0, 0, 0), 5000, make_shared<dielectric>(1.5));
+	objects.add(make_shared<constant_medium>(boundary, .0001, make_shared<solid_color>(1, 1, 1)));
+
+	auto emat = make_shared<lambertian>(make_shared<image_texture>("earthmap.jpg"));
+
+	objects.add(make_shared<sphere>(point3(400, 200, 400), 100, emat));
+	auto pertext = make_shared<noise_texture>(0.1);
+	objects.add(make_shared<sphere>(point3(220, 280, 300), 80, make_shared<lambertian>(pertext)));
+
+	hittable_list boxes2;
+	auto white = make_shared<lambertian>(make_shared<solid_color>(.73, .73, .73));
+	int ns = 1000;
+	for (int i = 0; i < ns; i++)
+		boxes2.add(make_shared<sphere>(point3::random(0, 165), 10, white));
+
+	objects.add(make_shared<translate>(make_shared<rotate_y>(make_shared<bvh_node>(boxes2, 0, 1), 15), vec3(-100, 270, 395)));
+	return objects;
+}
+
+void final_scene()
+{
+	const int image_width = 400;
+	const int image_height = 400;
+	const int samples_per_pixel = 2000;
+	const int max_depth = 50;
+	const color background(0, 0, 0);
+	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+	auto world = final();
+
+	const auto aspect_ratio = double(image_width) / image_height;
+	point3 lookfrom(478, 278, -600);
+	point3 lookat(278, 278, 0);
+	vec3 vup(0, 1, 0);  	//vup决	定了视角在camera平面上旋转多少度，0，1，0就是人直立，1，0，0就是往右歪头
+	auto dist_to_focus = 10.0;
+	auto aperture = 0.0;
+	auto vfov = 40.0;
+	camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+
+	for (int j = image_height - 1; j >= 0; j--) {
+		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+		for (int i = 0; i < image_width; i++) {
+			color color(0, 0, 0);
+			for (int s = 0; s < samples_per_pixel; s++) {
+				auto u = (i + random_double()) / image_width;    //random_double() is for anti-alias
+				auto v = (j + random_double()) / image_height;
+				ray r = cam.get_ray(u, v);                       //在get_ray中调整发出点，时间在[time0, time1]之间随机选择
+				color += ray_color(r, background, world, max_depth);
+			}
+			write_color(std::cout, color, samples_per_pixel);
+		}
+	}
+
+	std::cerr << "\nDone.\n";
+}
+
 int main()
 {
-	simple_light_scene();
+	final_scene();
 	return 0;
 }

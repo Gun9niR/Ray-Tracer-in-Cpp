@@ -14,7 +14,9 @@ public:
 		for (int i = 0; i < 3; i++) { //three dimensions
 			auto invD = 1.0f / r.direction()[i];
 			auto t0 = (_min[i] - r.origin()[i]) * invD;
-			auto t1 = (_min[i] - r.origin()[i]) * invD;
+			auto t1 = (_max[i] - r.origin()[i]) * invD;
+			if (invD < 0.0f)
+				std::swap(t0, t1);
 			tmin = t0 > tmin ? t0 : tmin;
 			tmax = t1 < tmax ? t1 : tmax;
 			if (tmax <= tmin)
@@ -23,7 +25,7 @@ public:
 		return true;
 	}
 
-public:
+private:
 	point3 _min;
 	point3 _max;
 };

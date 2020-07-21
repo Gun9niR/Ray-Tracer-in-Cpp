@@ -25,7 +25,7 @@ public:
 		u = unit_vector(cross(vup, w));     //平行于平面，垂直于vup
 		v = cross(w, u);                    //平行于平面，和vup, w在同一个平面内
 
-		lower_left_corner = origin - half_width * focus_dist * u-half_height * focus_dist * v - focus_dist * w;
+		lower_left_corner = origin - half_width * focus_dist * u - half_height * focus_dist * v - focus_dist * w;
 
 		horizontal = 2 * half_width * focus_dist * u;   //对焦平面的宽度向量
 		vertical = 2 * half_height * focus_dist * v;    //对焦平面的高度向量

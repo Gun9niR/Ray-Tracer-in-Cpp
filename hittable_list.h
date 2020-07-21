@@ -43,15 +43,15 @@ aabb surrounding_box(const aabb& box0, const aabb& box1) {
 	point3 small(fmin(box0.min().x(), box1.min().x()),
 				 fmin(box0.min().y(), box1.min().y()),
 				 fmin(box0.min().z(), box1.min().z()));
-	point3 big(fmin(box0.max().x(), box1.max().x()),
-				 fmin(box0.max().y(), box1.max().y()),
-				 fmin(box0.max().z(), box1.max().z()));
+	point3 big(fmax(box0.max().x(), box1.max().x()),
+				 fmax(box0.max().y(), box1.max().y()),
+				 fmax(box0.max().z(), box1.max().z()));
 	return aabb(small, big);
 }
 
 //每次调用
 bool hittable_list::bounding_box(double t0,double t1,aabb& output_box) const{
-	if (objects.empty()) return false;
+	if (objects.empty()) return false;   
 
 	aabb temp_box;
 	bool first_box = true;
