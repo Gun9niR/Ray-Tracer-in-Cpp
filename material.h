@@ -2,10 +2,12 @@
 #include "ray.h"
 #include "hittable.h"
 #include "texture.h"
+#include "onb.h"
+
 class material
 {
 public:
-	virtual color emitted(double u, double v, const point3& p) const {
+	virtual color emitted(const ray& r_in, const hit_record& rec, double u, double v, const point3& p) const {
 		return color(0, 0, 0);
 	}
 
@@ -28,16 +30,14 @@ public:
 
 	virtual bool scatter(const ray& r_in, const hit_record& rec, color& alb, ray& scattered, double& pdf) const override {
 		// compute the scattering ray
-		vec3 scatter_direction = rec.normal + random_unit_vector();
-
-		if (scatter_direction.near_zero()) {
-			scatter_direction = rec.normal;
-		}
-
-		scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time());
+		onb uvw;
+		uvw.build_from_w(rec.normal);
+		auto direction = uvw.local(random_cosine_direction());
+		
+		scattered = ray(rec.p, unit_vector(direction), r_in.time());
 
 		alb = albedo->value(rec.u, rec.v, rec.p);
-		pdf = dot(rec.normal, scattered.direction()) / pi;  // dot is actually cosine
+		pdf = dot(uvw.w(), scattered.direction()) / pi;  // dot is actually cosine
 		return true;
 	}
 
@@ -120,8 +120,11 @@ public:
 
 	virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const { return false; }
 
-	virtual color emitted(double u, double v, const point3& p) const {
-		return emit->value(u, v, p);
+	virtual color emitted(const ray& r_in, const hit_record& rec, double u, double v, const point3& p) const {
+		if (rec.front_face)
+			return emit->value(u, v, p);
+		else
+			return color(0, 0, 0);
 	}
 
 public:

@@ -179,6 +179,7 @@
     <ClInclude Include="hittable_list.h" />
     <ClInclude Include="rtweekend.h" />
     <ClInclude Include="moving_sphere.h" />
+    <ClInclude Include="onb.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

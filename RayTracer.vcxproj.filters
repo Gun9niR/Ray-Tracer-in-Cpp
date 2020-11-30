@@ -25,6 +25,9 @@
     <Filter Include="头文件\Common\External">
       <UniqueIdentifier>{1c0600ec-9c48-4033-9506-d34b6ea9976b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\TheRestOfYourLife">
+      <UniqueIdentifier>{55daeab0-11f0-4f9f-929f-c3b61f3b3015}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h">
@@ -86,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="constant_medium.h">
       <Filter>头文件\TheNextWeek</Filter>
+    </ClInclude>
+    <ClInclude Include="onb.h">
+      <Filter>头文件\TheRestOfYourLife</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
