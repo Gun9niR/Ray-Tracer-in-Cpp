@@ -26,14 +26,18 @@ vec3 ray_color(const ray& r, const color& background, const hittable& world, int
 		return background;
 
 	ray scattered;
-	color attenuation;
 	color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+	double pdf;
+	color albedo;
 
-	if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+	if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
 		return emitted;
 	
 	//颜色是自己发出的光的颜色和折射光颜色的叠加
-	return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
+	return emitted + 
+		albedo * 
+		rec.mat_ptr->scattering_pdf(r, rec, scattered) *
+		ray_color(scattered, background, world, depth - 1) / pdf;
 }
 
 vec3 ray_color(const ray& r, const hittable& world, int depth) {
@@ -47,7 +51,8 @@ vec3 ray_color(const ray& r, const hittable& world, int depth) {
 	if (world.hit(r, 0.001, infinity, rec)) {
 		ray scattered;
 		vec3 attenuation;
-		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+		double pdf;
+		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered, pdf))
 			return attenuation * ray_color(scattered, world, depth - 1);
 		return vec3(0, 0, 0);
 	}
@@ -376,8 +381,8 @@ hittable_list cornell_box()
 
 void cornell_box_scene()
 {
-	const int image_width = 600;
-	const int image_height = 600;
+	const int image_width = 300;
+	const int image_height = 300;
 	const int samples_per_pixel = 100;
 	const int max_depth = 50;
 	const color background(0, 0, 0);
@@ -578,6 +583,6 @@ void final_scene()
 
 int main()
 {
-	final_scene();
+	cornell_box_scene();
 	return 0;
 }

@@ -8,24 +8,45 @@ public:
 	virtual color emitted(double u, double v, const point3& p) const {
 		return color(0, 0, 0);
 	}
-public:
-	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const = 0;
+
+	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered, double& pdf) const {
+		return false;
+	}
+
+	virtual double scattering_pdf(
+		const ray& r_in, const hit_record& rec, const ray& scattered
+	) const {
+		return 0;
+	}
 };
 
 class lambertian :public material 
 {
 public:
+	lambertian(const color& a) :albedo(make_shared<solid_color>(a)) {}
 	lambertian(shared_ptr<texture> a) :albedo(a) {}
 
-	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const {
-		//compute the reflecting ray.
+	virtual bool scatter(const ray& r_in, const hit_record& rec, color& alb, ray& scattered, double& pdf) const override {
+		// compute the scattering ray
 		vec3 scatter_direction = rec.normal + random_unit_vector();
-		scattered = ray(rec.p, scatter_direction, r_in.time());
-		attenuation = albedo->value(rec.u,rec.v,rec.p);
+
+		if (scatter_direction.near_zero()) {
+			scatter_direction = rec.normal;
+		}
+
+		scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time());
+
+		alb = albedo->value(rec.u, rec.v, rec.p);
+		pdf = dot(rec.normal, scattered.direction()) / pi;  // dot is actually cosine
 		return true;
 	}
+
+	double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
+		auto cosine = dot(rec.normal, unit_vector(scattered.direction()));
+		return cosine < 0 ? 0 : cosine / pi; // ideally, cosine < 0 is not supposed to happen
+	}
 public:
-	shared_ptr<texture> albedo; //Âþ·´ÉäÏµÊý
+	shared_ptr<texture> albedo;
 };
 
 class metal : public material 

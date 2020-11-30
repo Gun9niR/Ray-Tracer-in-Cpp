@@ -37,6 +37,12 @@ public:
 		return *this *= 1 / t;
 	}
 
+	bool near_zero() const {
+		// return true if the vector is close to zero in all dimensions.
+		const auto s = 1e-8;
+		return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+	}
+
 	double length() const {
 		return sqrt(length_squared());
 	}
