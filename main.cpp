@@ -11,7 +11,34 @@
 #include "box.h"
 #include "constant_medium.h"
 #include "bvh.h"
+#include "pdf.h"
 #include <iostream>
+
+vec3 ray_color(const ray& r, const color& background, const hittable& world, shared_ptr<hittable>& lights, int depth)
+{
+	//determine which color to use for the ray based on its coordinates
+	hit_record rec;
+
+	// If we've exceeded the ray bounce limit, no more light is gathered.
+	if (depth <= 0)
+		return vec3(0, 0, 0);
+
+	if (!world.hit(r, 0.001, infinity, rec))
+		return background;
+
+	ray scattered;
+	color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+	double pdf_val;
+	color albedo;
+	if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val)) {
+		return emitted;
+	}
+	hittable_pdf light_pdf(lights, rec.p);
+	scattered = ray(rec.p, light_pdf.generate(), r.time());
+	pdf_val = light_pdf.value(scattered.direction());
+
+	return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_color(scattered, background, world, lights, depth - 1) / pdf_val;
+}
 
 vec3 ray_color(const ray& r, const color& background, const hittable& world, int depth) 
 {
@@ -27,28 +54,16 @@ vec3 ray_color(const ray& r, const color& background, const hittable& world, int
 
 	ray scattered;
 	color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
-	double pdf;
+	double pdf_val;
 	color albedo;
-
-	if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
+	if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val)) {
 		return emitted;
-	
-	auto on_light = point3(random_double(213, 343), 554, random_double(227, 332));
-	auto to_light = on_light - rec.p;
-	auto distance_squared = to_light.length_squared();
-	to_light = unit_vector(to_light);
-	
-	if (dot(to_light, rec.normal) < 0) 
-		return emitted;
+	}
+	cosine_pdf p(rec.normal);
+	scattered = ray(rec.p, p.generate(), r.time());
+	pdf_val = p.value(scattered.direction());
 
-	double light_area = (343 - 213) * (332 - 227);
-	auto light_cosine = fabs(to_light.y());
-	if (light_cosine < 0.000001) return emitted;
-
-	pdf = distance_squared / (light_cosine * light_area);
-	scattered = ray(rec.p, to_light, r.time());
-	//颜色是自己发出的光的颜色和折射光颜色的叠加
-	return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_color(scattered, background, world, depth - 1) / pdf;
+	return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_color(scattered, background, world, depth - 1) / pdf_val;
 }
 
 vec3 ray_color(const ray& r, const hittable& world, int depth) {
@@ -392,8 +407,8 @@ hittable_list cornell_box()
 
 void cornell_box_scene()
 {
-	const int image_width = 500;
-	const int image_height = 500;
+	const int image_width = 300;
+	const int image_height = 300;
 	const int samples_per_pixel = 20;
 	const int max_depth = 50;
 	const color background(0, 0, 0);
@@ -401,6 +416,7 @@ void cornell_box_scene()
 
 
 	auto world = cornell_box();
+	shared_ptr<hittable> lights = make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>());
 
 	const auto aspect_ratio = double(image_width) / image_height;
 	point3 lookfrom(278, 278, -800);
@@ -419,7 +435,7 @@ void cornell_box_scene()
 				auto u = (i + random_double()) / image_width;    //random_double() is for anti-alias
 				auto v = (j + random_double()) / image_height;
 				ray r = cam.get_ray(u, v);                       //在get_ray中调整发出点，时间在[time0, time1]之间随机选择
-				color += ray_color(r, background, world, max_depth);
+				color += ray_color(r, background, world, lights, max_depth);
 			}
 			write_color(std::cout, color, samples_per_pixel);
 		}

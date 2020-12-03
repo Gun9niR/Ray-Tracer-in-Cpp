@@ -93,6 +93,9 @@
     <ClInclude Include="onb.h">
       <Filter>头文件\TheRestOfYourLife</Filter>
     </ClInclude>
+    <ClInclude Include="pdf.h">
+      <Filter>头文件\TheRestOfYourLife</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

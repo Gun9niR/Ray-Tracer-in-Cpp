@@ -168,6 +168,7 @@
     <ClInclude Include="constant_medium.h" />
     <ClInclude Include="hittable.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="pdf.h" />
     <ClInclude Include="perlin.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="rtw_stb_image.h" />
