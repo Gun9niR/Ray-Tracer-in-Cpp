@@ -13,6 +13,7 @@
 #include "bvh.h"
 #include "pdf.h"
 #include <iostream>
+#include <ctime>
 
 vec3 ray_color(const ray& r, const color& background, const hittable& world, shared_ptr<hittable>& lights, int depth)
 {
@@ -33,9 +34,13 @@ vec3 ray_color(const ray& r, const color& background, const hittable& world, sha
 	if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val)) {
 		return emitted;
 	}
-	hittable_pdf light_pdf(lights, rec.p);
-	scattered = ray(rec.p, light_pdf.generate(), r.time());
-	pdf_val = light_pdf.value(scattered.direction());
+	
+	auto p0 = make_shared<hittable_pdf>(lights, rec.p);
+	auto p1 = make_shared<cosine_pdf>(rec.normal);
+	mixture_pdf mixed_pdf(p0, p1);
+
+	scattered = ray(rec.p, mixed_pdf.generate(), r.time());
+	pdf_val = mixed_pdf.value(scattered.direction());
 
 	return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_color(scattered, background, world, lights, depth - 1) / pdf_val;
 }
@@ -407,8 +412,8 @@ hittable_list cornell_box()
 
 void cornell_box_scene()
 {
-	const int image_width = 300;
-	const int image_height = 300;
+	const int image_width = 100;
+	const int image_height = 100;
 	const int samples_per_pixel = 20;
 	const int max_depth = 50;
 	const color background(0, 0, 0);
@@ -610,6 +615,11 @@ void final_scene()
 
 int main()
 {
+	clock_t time;
+	time = clock();
 	cornell_box_scene();
+	time = clock() - time;
+	std::cerr << "Total time: " << (double)(time) / CLOCKS_PER_SEC;
+	system("pause");
 	return 0;
 }
