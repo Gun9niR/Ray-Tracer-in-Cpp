@@ -25,7 +25,7 @@ public:
 };
 
 //determine if a ray hits any hittable thing in the hittable_list and stores the closest hit in rec
-bool hittable_list::hit(const const ray& r, double t_min, double t_max, hit_record& rec) const {
+bool hittable_list::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
 	hit_record temp_rec;
 	bool hit_anything = false;
 	auto closest_so_far = t_max;
@@ -49,14 +49,14 @@ aabb surrounding_box(const aabb& box0, const aabb& box1) {
 	return aabb(small, big);
 }
 
-//Ã¿´Îµ÷ÓÃ
+//Ã¿ï¿½Îµï¿½ï¿½ï¿½
 bool hittable_list::bounding_box(double t0,double t1,aabb& output_box) const{
 	if (objects.empty()) return false;   
 
 	aabb temp_box;
 	bool first_box = true;
 
-	for (const auto& object : objects) {  //¶ÔËùÓÐhittable½¨box
+	for (const auto& object : objects) {  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½hittableï¿½ï¿½box
 		if (!object->bounding_box(t0, t1, temp_box)) return false;
 		output_box = first_box ? temp_box : surrounding_box(output_box, temp_box);
 		first_box = false;

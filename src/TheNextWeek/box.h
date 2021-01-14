@@ -1,9 +1,9 @@
 #include"aabb.h"
 #include"aarect.h"
-#include"rtweekend.h"
-#include"material.h"
-#include"hittable.h"
-#include"hittable_list.h"
+#include"../InOneWeekend/rtweekend.h"
+#include"../InOneWeekend/material.h"
+#include"../InOneWeekend/hittable.h"
+#include"../InOneWeekend/hittable_list.h"
 class box :public hittable
 {
 public:

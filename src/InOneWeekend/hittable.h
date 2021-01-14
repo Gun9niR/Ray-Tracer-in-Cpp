@@ -1,8 +1,8 @@
 #pragma once
 
-#include"ray.h"
-#include"rtweekend.h"
-#include"aabb.h"
+#include"../common/ray.h"
+#include"../InOneWeekend/rtweekend.h"
+#include"../TheNextWeek/aabb.h"
 class material;
 
 struct hit_record {
@@ -67,7 +67,7 @@ public:
 	vec3 offset;
 };
 
-//Æ½ÒÆ
+//Æ½ï¿½ï¿½
 bool translate::hit(const ray& r, double t_min, double t_max, hit_record& rec) const
 {
 	ray moved_r(r.origin() - offset, r.direction(), r.time());

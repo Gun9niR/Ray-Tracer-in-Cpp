@@ -1,9 +1,9 @@
 #pragma once
-#include "ray.h"
+#include "../common/ray.h"
 #include "hittable.h"
-#include "texture.h"
-#include "onb.h"
-#include "pdf.h"
+#include "../TheNextWeek/texture.h"
+#include "../TheRestOfYourLife/onb.h"
+#include "../TheRestOfYourLife/pdf.h"
 
 class material
 {
@@ -42,7 +42,7 @@ public:
 		return true;
 	}
 
-	double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
+	double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
 		auto cosine = dot(rec.normal, unit_vector(scattered.direction()));
 		return cosine < 0 ? 0 : cosine / pi; // ideally, cosine < 0 is not supposed to happen
 	}

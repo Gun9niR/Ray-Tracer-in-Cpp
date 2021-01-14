@@ -1,6 +1,6 @@
 #pragma once
-#include"vec3.h"
-#include"ray.h"
+#include"../common/vec3.h"
+#include"../common/ray.h"
 class aabb 
 {
 public:

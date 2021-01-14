@@ -1,7 +1,7 @@
 #pragma once
-#include"rtweekend.h"
+#include"../InOneWeekend/rtweekend.h"
 #include"perlin.h"
-#include"rtw_stb_image.h"
+#include"../common/rtw_stb_image.h"
 
 class texture {
 public:

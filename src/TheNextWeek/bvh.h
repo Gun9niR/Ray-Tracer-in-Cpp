@@ -1,8 +1,8 @@
 #pragma once
 #include<algorithm>
 #include<iostream>
-#include"hittable.h"
-#include"hittable_list.h"
+#include"../InOneWeekend/hittable.h"
+#include"../InOneWeekend/hittable_list.h"
 class bvh_node :public hittable {
 public:
 	bvh_node();
@@ -15,7 +15,7 @@ public:
 	virtual bool bounding_box(double t0, double t1, aabb& output_box) const;
 	
 public:
-	shared_ptr<hittable> left;   //¿ÉÄÜÊÇbvh_node£¬Ò²¿ÉÄÜÊÇÊµÌå
+	shared_ptr<hittable> left;   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½bvh_nodeï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½
 	shared_ptr<hittable> right;
 	aabb box;
 };

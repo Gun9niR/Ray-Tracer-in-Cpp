@@ -11,6 +11,8 @@
 *.sln.docstates
 *.pdf
 tmp_img.ppm
+.DS_Store
+.vscode
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

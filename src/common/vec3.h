@@ -1,6 +1,6 @@
 #pragma once
 #include<iostream>
-#include"rtweekend.h"
+#include"../InOneWeekend/rtweekend.h"
 
 class vec3
 {
@@ -136,7 +136,7 @@ vec3 reflect(const vec3& v, const vec3& n)
 {
 	//v is the in ray, n is the normal of the hit point
 	//it returns the direction of the reflected ray, rather than the ray itself
-	return v - 2 * dot(v, n) * n;// n account for direction, dot account for the size, the minus is due to v¡¤b<0
+	return v - 2 * dot(v, n) * n;// n account for direction, dot account for the size, the minus is due to vï¿½ï¿½b<0
 }
 
 vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) 

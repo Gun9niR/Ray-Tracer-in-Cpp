@@ -1,7 +1,7 @@
 #pragma once
-#include"hittable.h"
+#include"../InOneWeekend/hittable.h"
 #include"texture.h"
-#include"material.h"
+#include"../InOneWeekend/material.h"
 #include<iostream>
 class isotropic :public material
 {

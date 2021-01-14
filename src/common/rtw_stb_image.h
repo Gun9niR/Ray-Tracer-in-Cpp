@@ -11,7 +11,7 @@
 
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../dependencies/stb_image.h"
 
 
 // Restore warning levels.

@@ -1,17 +1,17 @@
-﻿#include "rtweekend.h" //include utility functions and basic data types
+﻿#include "InOneWeekend/rtweekend.h" //include utility functions and basic data types
 
-#include "material.h"
-#include "hittable_list.h" //include the tool to store all the objects to be hitted
-#include "sphere.h" //a kind of hittable object
-#include "camera.h"
-#include "color.h"
-#include "moving_sphere.h"
-#include "rtw_stb_image.h"
-#include "aarect.h"
-#include "box.h"
-#include "constant_medium.h"
-#include "bvh.h"
-#include "pdf.h"
+#include "InOneWeekend/material.h"
+#include "InOneWeekend/hittable_list.h" //include the tool to store all the objects to be hitted
+#include "InOneWeekend/sphere.h" //a kind of hittable object
+#include "common/camera.h"
+#include "common/color.h"
+#include "TheNextWeek/moving_sphere.h"
+#include "common/rtw_stb_image.h"
+#include "TheNextWeek/aarect.h"
+#include "TheNextWeek/box.h"
+#include "TheNextWeek/constant_medium.h"
+#include "TheNextWeek/bvh.h"
+#include "TheRestOfYourLife/pdf.h"
 #include <iostream>
 #include <ctime>
 
@@ -92,7 +92,7 @@ vec3 ray_color(const ray& r, const hittable& world, int depth) {
 	return (1.0 - t) * vec3(1, 1, 1) + t * vec3(0.5, 0.7, 1.0);
 }
 
-hittable_list random() 
+hittable_list rtw()
 {
 	hittable_list world;
 
@@ -129,7 +129,7 @@ hittable_list random()
 	return world;
 }
 
-void random_scene()
+void rtw_scene()
 {
 	const int image_width = 400;
 	const int image_height = 225;
@@ -138,7 +138,7 @@ void random_scene()
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 
-	auto world = random();
+	auto world = rtw();
 
 	const auto aspect_ratio = double(image_width) / image_height;
 	point3 lookfrom(13, 2, 3);
@@ -288,7 +288,7 @@ void two_perlin_spheres_scene()
 
 hittable_list earth()
 {
-	auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+	auto earth_texture = make_shared<image_texture>("img_texture/earthmap.jpg");
 	auto earth_surface = make_shared<lambertian>(earth_texture);
 	auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
 
@@ -560,7 +560,7 @@ hittable_list final()
 	boundary = make_shared<sphere>(point3(0, 0, 0), 5000, make_shared<dielectric>(1.5));
 	objects.add(make_shared<constant_medium>(boundary, .0001, make_shared<solid_color>(1, 1, 1)));
 
-	auto emat = make_shared<lambertian>(make_shared<image_texture>("earthmap.jpg"));
+	auto emat = make_shared<lambertian>(make_shared<image_texture>("img_texture/earthmap.jpg"));
 
 	objects.add(make_shared<sphere>(point3(400, 200, 400), 100, emat));
 	auto pertext = make_shared<noise_texture>(0.1);
@@ -617,9 +617,11 @@ int main()
 {
 	clock_t time;
 	time = clock();
-	cornell_box_scene();
+
+	earth_scene();
+
 	time = clock() - time;
 	std::cerr << "Total time: " << (double)(time) / CLOCKS_PER_SEC;
-	system("pause");
+
 	return 0;
 }

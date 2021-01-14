@@ -1,5 +1,5 @@
 #pragma once
-#include"hittable.h"
+#include"../InOneWeekend/hittable.h"
 class xy_rect : public hittable {
 public:
 	xy_rect() {}
@@ -45,9 +45,9 @@ public:
 	xz_rect(double _x0, double _x1, double _z0, double _z1, double _k, shared_ptr<material> mat)
 		:x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat) {}
 
-	virtual bool hit(const ray& r, double t0, double t1, hit_record& rec) const;
+	virtual bool hit(const ray& r, double t0, double t1, hit_record& rec) const override;
 
-	virtual bool bounding_box(double t0, double t1, aabb& output_box) const {
+	virtual bool bounding_box(double t0, double t1, aabb& output_box) const override {
 		//pad the Z dimension a small amount
 		output_box = aabb(point3(x0, k-0.0001, z0), point3(x1, k+0.0001, z1));
 		return true;

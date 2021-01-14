@@ -1,5 +1,5 @@
 #pragma once
-#include"rtweekend.h"
+#include"../InOneWeekend/rtweekend.h"
 inline double trilinear_interp(vec3 c[2][2][2], double u, double v, double w)
 {
 	//Hermitian smoothing to reduce the blocky effect
@@ -11,7 +11,6 @@ inline double trilinear_interp(vec3 c[2][2][2], double u, double v, double w)
 	for (int i = 0; i < 2; i++)
 		for (int j = 0; j < 2; j++)
 			for (int k = 0; k < 2; k++) {
-				//weightÊ¹µÃ¸ñµãÉÏµÄÖµ»á¸ù¾Ýµ±Ç°ËùÇóµãµÄ×ø±ê¶ø±ä»¯
 				vec3 weight_v(u - i, v - j, w - k);
 				accum += (i * uu + (1 - i) * (1 - uu)) * (j * vv + (1 - j) * (1 - vv)) * (k * ww + (1 - k) * (1 - ww)) * dot(c[i][j][k], weight_v);
 			}
@@ -39,19 +38,19 @@ public:
 		delete[] perm_z;
 	}
 
-	double noise(const point3& p) const {  //¹¹ÔìÖ®ºó£¬Ä³Ò»¶¨µãµÄnoiseÊÇ¶àÉÙÊÇÈ·¶¨µÄ
-		//È¡×ø±êµÄÐ¡Êý²¿·Ö
+	double noise(const point3& p) const {  //ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ä³Ò»ï¿½ï¿½ï¿½ï¿½ï¿½noiseï¿½Ç¶ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½
+		//È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		auto u = p.x() - floor(p.x());
 		auto v = p.y() - floor(p.y());
 		auto w = p.z() - floor(p.z());
 
-		//È¡×ø±êµÄÕûÊý²¿·Ö
+		//È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		int i = floor(p.x());
 		int j = floor(p.y());
 		int k = floor(p.z());
 		vec3 c[2][2][2];
 
-		//±£³ÖÁ½¸öÖá²»±ä£¬ÁíÒ»¸öÖá·Ö±ðÉÏÏÂÈ¡Õû£¬È»ºó3¸öÖá×ø±êÒì»òµÃµ½ranvec[]ÏÂ±ê£¬ÔÙÓÉÏÂ±ê»ñµÃÒ»¸öËæ»úµÄvec3·Å½øc[][][]
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á²»ï¿½ä£¬ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ranvec[]ï¿½Â±ê£¬ï¿½ï¿½ï¿½ï¿½ï¿½Â±ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vec3ï¿½Å½ï¿½c[][][]
 		for (int di = 0; di < 2; di++)
 			for (int dj = 0; dj < 2; dj++)
 				for (int dk = 0; dk < 2; dk++)
@@ -61,7 +60,7 @@ public:
 						perm_z[(k + dk) & 255]
 					];
 
-		//ÈýÏßÐÔ²åÖµ£¬·µ»Ø»Ò¶ÈÖµ
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Ø»Ò¶ï¿½Öµ
 		return trilinear_interp(c, u, v, w);
 	}
 
@@ -70,7 +69,7 @@ public:
 		auto temp_p = p;
 		auto weight = 1.0;
 
-		//Ã¿´Îµã×ø±ê*2£¬È¨ÖØ/2£¬accum¿ÉÄÜ´óÓÚ1
+		//Ã¿ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½*2ï¿½ï¿½È¨ï¿½ï¿½/2ï¿½ï¿½accumï¿½ï¿½ï¿½Ü´ï¿½ï¿½ï¿½1
 		for (int i = 0; i < depth; i++) {
 			accum += weight * noise(temp_p);
 			weight *= 0.5;
